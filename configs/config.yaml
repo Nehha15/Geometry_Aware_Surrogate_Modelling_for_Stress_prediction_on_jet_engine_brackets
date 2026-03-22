@@ -1,0 +1,82 @@
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  results_dir: data/results
+  labels_csv: data/raw/bracket_labels.csv
+  pointcloud_npz: data/raw/xyzdmlc.npz
+  targets_npz: data/raw/targets.npz
+  n_points: 2048
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  augment: true
+  seed: 42
+  load_directions:
+  - ver
+  - hor
+  - dia
+  - tor
+material:
+  E_GPa: 113.8
+  nu: 0.342
+  yield_stress_MPa: 227.6
+  hardening_MPa: 355.56
+  density_g_mm3: 0.00447
+model:
+  name: pointnet_plus
+  use_tnet: true
+  dropout: 0.4
+  n_load_directions: 3
+  n_phys_features: 13
+  sa1_npoint: 512
+  sa1_radius: 0.2
+  sa1_nsample: 32
+  sa1_out_ch:
+  - 64
+  - 64
+  - 128
+  sa2_npoint: 128
+  sa2_radius: 0.4
+  sa2_nsample: 64
+  sa2_out_ch:
+  - 128
+  - 128
+  - 256
+  sa3_out_ch:
+  - 256
+  - 512
+  - 1024
+  regressor_ch:
+  - 512
+  - 256
+  - 128
+training:
+  epochs: 150
+  batch_size: 16
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  scheduler: cosine
+  scheduler_T_max: 150
+  early_stopping_patience: 999
+  grad_clip: 1.0
+  checkpoint_dir: checkpoints
+  log_dir: logs
+  save_best_only: true
+  early_stopping_min_delta: 0.0001
+  early_stopping_ema_alpha: 0.3
+  save_every: 10
+loss:
+  primary: huber
+  huber_delta: 1.0
+  physics_weight: 0.05
+  use_physics_loss: true
+evaluation:
+  metrics:
+  - rmse
+  - mae
+  - r2
+  - mape
+  - max_error
+  failure_threshold_pct: 10.0
+  report_dir: data/results
+  plots_dir: outputs
